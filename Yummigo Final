@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Yummigo — AI-Powered Dining</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#C4902A;--gold2:#F2C46D;--gold3:#A87520;
+  --gold-bg:rgba(196,144,42,0.11);--gold-b:rgba(196,144,42,0.28);
+  --dark:#09090E;--s2:#17171F;--s3:#1E1E2A;--s4:#252535;
+  --text:#F0EBE0;--muted:#7A7590;--border:rgba(212,166,71,0.14);
+  --green:#2DB87A;--green-bg:rgba(45,184,122,0.12);--green-b:rgba(45,184,122,0.3);
+  --red:#E05252;--red-bg:rgba(224,82,82,0.1);--red-b:rgba(224,82,82,0.28);
+  --blue:#4A9AE8;--blue-bg:rgba(74,154,232,0.1);--blue-b:rgba(74,154,232,0.28);
+  --amber:#D4A020;--amber-bg:rgba(212,160,32,0.1);--amber-b:rgba(212,160,32,0.28);
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:#050508;color:var(--text);overflow:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{display:none}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+@keyframes floatX{0%,100%{transform:translate(0,0)}33%{transform:translate(12px,-14px)}66%{transform:translate(-8px,10px)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(196,144,42,0.45)}50%{box-shadow:0 0 0 10px rgba(196,144,42,0)}}
+@keyframes cookFill{from{width:0}to{width:42%}}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px) scale(.95)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes fillBar{from{width:0}to{width:var(--w,80%)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes wokFlame{0%,100%{transform:scaleY(1) rotate(-2deg)}50%{transform:scaleY(1.18) rotate(2deg)}}
+@keyframes spark{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx,20px),var(--sy,-40px)) scale(0)}}
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes glowPulse{0%,100%{text-shadow:0 0 20px rgba(196,144,42,0)}50%{text-shadow:0 0 40px rgba(196,144,42,0.5)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes numberTick{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes otpShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+.device{width:100vw;height:100vh;max-width:430px;margin:0 auto;position:relative;overflow:hidden;background:var(--dark)}
+.scr{position:absolute;inset:0;display:none;flex-direction:column;background:var(--dark)}
+.scr.active{display:flex;animation:slideIn .32s ease}
+.scroll{flex:1;overflow-y:auto;padding:14px 16px 90px}
+.ph{display:flex;align-items:center;gap:10px;padding:12px 16px 10px;flex-shrink:0;border-bottom:1px solid var(--border);background:rgba(9,9,14,.92);backdrop-filter:blur(12px)}
+.bk{width:34px;height:34px;border-radius:10px;background:var(--s3);border:1px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-family:inherit}
+.bk:hover{background:var(--gold-bg);border-color:var(--gold-b);color:var(--gold)}
+.ph-t{font-size:16px;font-weight:600;flex:1}.ph-s{font-size:11px;color:var(--muted);margin-top:1px}
+.btn{width:100%;padding:13px 20px;background:linear-gradient(135deg,#A87520,#C4902A);border:none;border-radius:13px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{opacity:.88;box-shadow:0 6px 28px rgba(196,144,42,.4);transform:translateY(-1px)}
+.btn:disabled{background:var(--s4);color:var(--muted);cursor:not-allowed;transform:none;box-shadow:none;opacity:1}
+.gbtn{width:100%;padding:12px 20px;background:var(--s2);border:1px solid var(--border);border-radius:13px;color:var(--text);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.gbtn:hover{background:var(--s3);border-color:var(--gold-b);color:var(--gold)}
+.sbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border:1px solid var(--border);border-radius:13px;background:rgba(255,255,255,.04);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:10px;transition:all .2s}
+.sbtn:hover{background:var(--gold-bg);border-color:var(--gold-b);transform:translateY(-1px)}
+.finp{width:100%;padding:11px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:all .25s}
+.finp:focus{border-color:var(--gold-b);background:rgba(196,144,42,0.06);box-shadow:0 0 0 3px rgba(196,144,42,0.08)}
+.finp::placeholder{color:var(--muted)}
+select.finp option{background:#17171F}
+input[type=time].finp{color-scheme:dark}
+.card{background:var(--s2);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:13px}
+.card.cl{cursor:pointer;transition:transform .22s,box-shadow .22s}
+.card.cl:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,.5)}
+.cb{padding:14px 16px}
+.chip{padding:8px 14px;border:1px solid var(--border);border-radius:100px;font-size:12px;cursor:pointer;transition:all .18s;background:var(--s2);color:var(--text);font-family:inherit}
+.chip.on{background:var(--gold-bg);border-color:var(--gold-b);color:var(--gold);font-weight:500}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:500;white-space:nowrap}
+.bg{background:var(--green-bg);border:1px solid var(--green-b);color:var(--green)}
+.bb{background:var(--blue-bg);border:1px solid var(--blue-b);color:var(--blue)}
+.ba{background:var(--amber-bg);border:1px solid var(--amber-b);color:var(--amber)}
+.br{background:var(--red-bg);border:1px solid var(--red-b);color:var(--red)}
+.bgo{background:var(--gold-bg);border:1px solid var(--gold-b);color:var(--gold)}
+.mbar{margin-top:10px}
+.mbar-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.mbar-lbl span:last-child{color:var(--gold);font-weight:600}
+.mtrack{height:5px;background:var(--s4);border-radius:3px;overflow:hidden}
+.mfill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:3px;animation:fillBar 1.3s ease forwards}
+.tl-row{display:flex;gap:10px;align-items:flex-start}
+.tl-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.tl-dot.dn{background:var(--green-bg);border:1.5px solid var(--green-b);color:var(--green)}
+.tl-dot.ac{background:var(--gold-bg);border:1.5px solid var(--gold-b);color:var(--gold);animation:pulse 2s infinite}
+.tl-dot.pd{background:var(--s4);border:1px solid var(--border);color:var(--muted)}
+.tl-line{width:2px;min-height:16px;flex:1;margin:3px 0;border-radius:1px}
+.tl-line.dn{background:var(--green-b)}.tl-line.pd{background:var(--border)}
+.tl-ct{padding-bottom:18px;flex:1}
+.tl-t{font-size:13px;font-weight:500;margin-bottom:3px}
+.tl-s{font-size:11px;color:var(--muted);line-height:1.5}
+.bnav{position:absolute;bottom:0;left:0;right:0;height:70px;background:rgba(9,9,14,.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center;padding:0 4px 10px;z-index:40}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:5px 10px;border-radius:10px;border:none;background:transparent;color:var(--muted);font-size:9px;font-family:inherit;font-weight:400;transition:all .2s;min-width:52px}
+.ni.on{background:var(--gold-bg);color:var(--gold);font-weight:600}
+.ni .ico{font-size:22px}
+#toast{position:fixed;top:54px;left:50%;transform:translateX(-50%);padding:9px 20px;border-radius:100px;font-size:12px;font-weight:500;z-index:500;white-space:nowrap;display:none;pointer-events:none}
+.ai-banner{background:linear-gradient(135deg,var(--gold-bg),rgba(232,164,90,.05));border:1px solid var(--border);border-radius:14px;padding:13px 15px;display:flex;gap:11px;align-items:flex-start;margin-bottom:14px}
+.sep{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:11px;margin:14px 0}
+.sep::before,.sep::after{content:'';flex:1;height:1px;background:var(--border)}
+.slabel{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin:0 0 13px;color:var(--text)}
+.mlabel{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;font-weight:500;margin-bottom:10px}
+.row-b{display:flex;justify-content:space-between;align-items:center}
+.rescue-g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.res-btn{padding:11px 7px;background:var(--s3);border:1px solid var(--border);border-radius:11px;font-size:12px;font-weight:500;cursor:pointer;color:var(--text);font-family:inherit;text-align:center;transition:all .2s}
+.res-btn:hover{background:var(--s4);transform:translateY(-1px)}
+.stat-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-c{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:10px 13px}
+.stat-l{font-size:10px;color:var(--muted);margin-bottom:3px}
+.stat-v{font-size:18px;font-weight:700}
+.stat-u{font-size:10px;font-weight:400;color:var(--muted)}
+.prog-w{height:5px;background:var(--s4);border-radius:3px;overflow:hidden;margin-top:7px}
+.prog-b{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:3px;animation:cookFill 2.8s ease forwards}
+.vote-bar-w{flex:1;height:7px;background:var(--s4);border-radius:4px;overflow:hidden}
+.vote-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:4px;transition:width .7s ease}
+.tog{width:42px;height:23px;border-radius:12px;position:relative;cursor:pointer;transition:background .25s;border:none;flex-shrink:0;outline:none}
+.tog.on{background:var(--green)}.tog.off{background:var(--s4);border:1px solid var(--border)}
+.tog::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:2px;transition:left .22s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.tog.on::after{left:22px}.tog.off::after{left:2px}
+.alert{padding:11px 14px;border-radius:12px;font-size:12px;line-height:1.55;display:flex;gap:9px;align-items:flex-start;margin-bottom:13px}
+.alert.green{background:var(--green-bg);border:1px solid var(--green-b);color:var(--green)}
+.alert.amber{background:var(--amber-bg);border:1px solid var(--amber-b);color:var(--amber)}
+.alert.blue{background:var(--blue-bg);border:1px solid var(--blue-b);color:var(--blue)}
+#login-canvas{position:absolute;inset:0;z-index:0}
+.otp-boxes{display:flex;gap:10px;justify-content:center;margin:16px 0}
+.otp-box{width:46px;height:54px;border-radius:13px;background:rgba(255,255,255,.06);border:1.5px solid var(--border);color:var(--text);font-size:22px;font-weight:700;text-align:center;outline:none;transition:all .22s;font-family:inherit}
+.otp-box:focus{border-color:var(--gold-b);background:rgba(196,144,42,.08);box-shadow:0 0 0 3px rgba(196,144,42,.1)}
+.dish-img-wrap{height:180px;position:relative;overflow:hidden}
+.dish-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+.card.cl:hover .dish-img-wrap img{transform:scale(1.06)}
+.dish-img-overlay{position:absolute;bottom:0;left:0;right:0;height:70px;background:linear-gradient(to top,rgba(0,0,0,.7),transparent)}
+.rest-img-wrap{height:160px;position:relative;overflow:hidden}
+.rest-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+.card.cl:hover .rest-img-wrap img{transform:scale(1.05)}
+.loc-search{width:100%;padding:10px 14px 10px 38px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border .2s}
+.loc-search:focus{border-color:var(--gold-b)}
+.loc-search::placeholder{color:var(--muted)}
+.country-list{max-height:220px;overflow-y:auto;background:var(--s2);border:1px solid var(--border);border-radius:12px;margin-top:6px}
+.country-item{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;transition:background .15s;font-size:13px}
+.country-item:hover{background:var(--s3)}
+.country-item.sel{background:var(--gold-bg);color:var(--gold)}
+.country-hdr{padding:6px 14px 3px;font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.8px;font-weight:600;background:var(--s3);cursor:default}
+.msg{max-width:84%;padding:11px 14px;border-radius:17px;font-size:13px;line-height:1.56;margin-bottom:11px;animation:fadeUp .25s ease}
+.msg.ai{background:var(--s2);border:1px solid var(--border);border-bottom-left-radius:4px;align-self:flex-start}
+.msg.me{background:linear-gradient(135deg,#A87520,var(--gold));color:#fff;border-bottom-right-radius:4px;align-self:flex-end;margin-left:auto}
+.ai-head{font-size:10px;color:var(--muted);font-weight:500;margin-bottom:5px}
+.chat-area{display:flex;flex-direction:column;padding:14px 14px 10px;flex:1;overflow-y:auto}
+.tdot{width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block;animation:bounce .9s ease-in-out infinite}
+.tbl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;max-width:295px;margin:0 auto 14px}
+.tbl-btn{aspect-ratio:1;border-radius:10px;border:1.5px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:500;background:transparent;font-family:inherit;transition:all .2s}
+.tbl-btn.av{border-color:var(--green);color:var(--green);cursor:pointer}
+.tbl-btn.av:hover,.tbl-btn.av.pk{background:var(--green-bg)}
+.tbl-btn.rs{border-color:var(--gold);color:var(--gold);cursor:default}
+.tbl-btn.oc{border-color:var(--red);color:var(--red);cursor:default}
+.food-float{position:absolute;font-size:28px;pointer-events:none;animation:floatX 6s ease-in-out infinite;opacity:0.15}
+.mode-tab{flex:1;padding:10px 8px;border:1px solid var(--border);color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;background:var(--s3)}
+.mode-tab.on{background:linear-gradient(135deg,#A87520,#C4902A);color:#fff;font-weight:600;border-color:transparent}
+</style>
+</head>
+<body>
+<div class="device" id="app">
+<div id="toast"></div>
+
+<!-- ══ LOGIN ══ -->
+<div class="scr active" id="s-login">
+  <canvas id="login-canvas"></canvas>
+  <div class="food-float" style="top:12%;left:8%;animation-delay:0s;animation-duration:7s">🍜</div>
+  <div class="food-float" style="top:22%;right:10%;animation-delay:1.5s;animation-duration:9s;font-size:22px">🍣</div>
+  <div class="food-float" style="top:55%;left:5%;animation-delay:3s;animation-duration:8s;font-size:20px">🥟</div>
+  <div class="food-float" style="top:65%;right:8%;animation-delay:2s;animation-duration:6s;font-size:24px">🍱</div>
+  <div class="food-float" style="top:35%;right:5%;animation-delay:4s;animation-duration:10s;font-size:18px">🍵</div>
+  <div class="food-float" style="top:78%;left:18%;animation-delay:0.5s;animation-duration:7.5s;font-size:20px">🥘</div>
+  <div id="wok-scene" style="position:absolute;bottom:-10px;right:-20px;width:200px;height:200px;opacity:0.12;pointer-events:none;z-index:1">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="140" rx="70" ry="28" fill="#8B4513" opacity=".7"/>
+      <path d="M40 140 Q50 90 100 80 Q150 90 160 140" fill="#5D2E0C" stroke="#8B4513" stroke-width="4"/>
+      <rect x="155" y="130" width="40" height="10" rx="5" fill="#666"/>
+      <ellipse cx="100" cy="105" rx="30" ry="12" fill="#C4902A" opacity=".6" style="animation:wokFlame .8s ease-in-out infinite"/>
+      <ellipse cx="90" cy="95" rx="16" ry="8" fill="#F2C46D" opacity=".5" style="animation:wokFlame .6s ease-in-out infinite;animation-delay:.2s"/>
+      <circle cx="80" cy="80" r="4" fill="#F2C46D" opacity=".8" style="animation:spark 1.2s ease-out infinite;--sx:-15px;--sy:-30px"/>
+      <circle cx="110" cy="75" r="3" fill="#C4902A" opacity=".8" style="animation:spark 1.5s ease-out infinite;animation-delay:.4s;--sx:12px;--sy:-25px"/>
+      <circle cx="95" cy="70" r="2.5" fill="#fff" opacity=".6" style="animation:spark 1.8s ease-out infinite;animation-delay:.8s;--sx:-5px;--sy:-35px"/>
+    </svg>
+  </div>
+  <div style="position:relative;z-index:2;padding:44px 24px 0;flex:1;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:28px;animation:logoFloat 3s ease-in-out infinite">
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C4902A"/><stop offset="100%" stop-color="#F2C46D"/></linearGradient></defs><line x1="10" y1="3" x2="10" y2="16" stroke="url(#lg1)" stroke-width="3.5" stroke-linecap="round"/><line x1="18" y1="3" x2="18" y2="16" stroke="url(#lg1)" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="3" x2="22" y2="10" stroke="url(#lg1)" stroke-width="2.5" stroke-linecap="round"/><line x1="10" y1="16" x2="14" y2="22" stroke="url(#lg1)" stroke-width="3.5" stroke-linecap="round"/><line x1="18" y1="16" x2="14" y2="22" stroke="url(#lg1)" stroke-width="3.5" stroke-linecap="round"/><line x1="14" y1="22" x2="14" y2="37" stroke="url(#lg1)" stroke-width="3.5" stroke-linecap="round"/><circle cx="30" cy="9" r="2.8" fill="url(#lg1)" opacity=".8"/><circle cx="34" cy="17" r="2" fill="url(#lg1)" opacity=".6"/></svg>
+      <span style="font-family:'Playfair Display',serif;font-size:28px;font-weight:800;background:linear-gradient(135deg,#C4902A,#F2C46D);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glowPulse 3s ease-in-out infinite">Yummigo</span>
+    </div>
+    <div style="font-size:11px;color:var(--gold);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px;animation:fadeUp .6s ease .2s both">&#10022; AI-Powered Dining</div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:38px;line-height:1.08;font-weight:800;margin-bottom:10px;animation:fadeUp .6s ease .3s both">Eat <span style="background:linear-gradient(135deg,#C4902A,#F2C46D);-webkit-background-clip:text;-webkit-text-fill-color:transparent">smarter,</span><br>dine better.</h1>
+    <p style="color:var(--muted);font-size:13px;line-height:1.65;animation:fadeUp .6s ease .4s both">Your personal AI companion that knows what you crave before you do.</p>
+    <div style="flex:1"></div>
+  </div>
+  <div style="position:relative;z-index:2;background:rgba(12,12,20,.97);backdrop-filter:blur(24px);border-top:1px solid var(--border);border-radius:30px 30px 0 0;padding:26px 22px 36px;animation:slideUp .5s ease .2s both">
+    <div id="login-form">
+      <button class="sbtn" onclick="go('s-loc')">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 002.38-5.88c0-.57-.05-.66-.15-1.17z" fill="#4285F4"/><path d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 01-7.18-2.54H1.83v2.07A8 8 0 008.98 17z" fill="#34A853"/><path d="M4.5 10.52a4.8 4.8 0 010-3.04V5.41H1.83a8 8 0 000 7.18l2.67-2.07z" fill="#FBBC05"/><path d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 001.83 5.4L4.5 7.48a4.77 4.77 0 014.48-3.3z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <button class="sbtn" onclick="go('s-loc')">&#128231; Continue with Email</button>
+      <div class="sep">or use phone</div>
+      <label style="display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Mobile Number</label>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <select id="dial-code" class="finp" style="width:92px;flex-shrink:0;padding:11px 8px">
+          <option value="+91">&#127470;&#127475; +91</option><option value="+1">&#127482;&#127480; +1</option>
+          <option value="+44">&#127468;&#127463; +44</option><option value="+81">&#127471;&#127477; +81</option>
+          <option value="+82">&#127472;&#127479; +82</option><option value="+61">&#127462;&#127482; +61</option>
+          <option value="+49">&#127465;&#127466; +49</option><option value="+33">&#127467;&#127479; +33</option>
+          <option value="+971">&#127462;&#127466; +971</option><option value="+65">&#127480;&#127468; +65</option>
+          <option value="+86">&#127464;&#127475; +86</option><option value="+55">&#127463;&#127479; +55</option>
+          <option value="+7">&#127479;&#127482; +7</option><option value="+27">&#127480;&#127462; +27</option>
+        </select>
+        <input class="finp" type="tel" id="phone-input" placeholder="98765 43210" style="flex:1" maxlength="12" oninput="this.value=this.value.replace(/\D/g,'')">
+      </div>
+      <button class="btn" onclick="sendOTP()">Send OTP &#10022;</button>
+      <p style="text-align:center;color:var(--muted);font-size:12px;margin-top:13px">New here? <a onclick="go('s-loc')" style="color:var(--gold);cursor:pointer">Create account</a></p>
+    </div>
+    <div id="otp-form" style="display:none">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:36px;margin-bottom:8px">&#128241;</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px">Enter OTP</div>
+        <div id="otp-sent-to" style="font-size:12px;color:var(--muted)">Sent to your number</div>
+      </div>
+      <div class="otp-boxes">
+        <input class="otp-box" type="tel" maxlength="1" id="otp0" oninput="otpNext(0)" onkeydown="otpBack(event,0)">
+        <input class="otp-box" type="tel" maxlength="1" id="otp1" oninput="otpNext(1)" onkeydown="otpBack(event,1)">
+        <input class="otp-box" type="tel" maxlength="1" id="otp2" oninput="otpNext(2)" onkeydown="otpBack(event,2)">
+        <input class="otp-box" type="tel" maxlength="1" id="otp3" oninput="otpNext(3)" onkeydown="otpBack(event,3)">
+        <input class="otp-box" type="tel" maxlength="1" id="otp4" oninput="otpNext(4)" onkeydown="otpBack(event,4)">
+        <input class="otp-box" type="tel" maxlength="1" id="otp5" oninput="otpNext(5)" onkeydown="otpBack(event,5)">
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:14px">Demo OTP: <strong id="demo-otp-display" style="color:var(--gold);letter-spacing:3px;font-size:15px"></strong></div>
+      <button class="btn" onclick="verifyOTP()">Verify &amp; Continue &#8594;</button>
+      <div style="display:flex;justify-content:space-between;margin-top:12px">
+        <button onclick="backToLogin()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">&#8592; Change number</button>
+        <a onclick="resendOTP()" style="color:var(--gold);font-size:12px;cursor:pointer">Resend OTP</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LOCATION ══ -->
+<div class="scr" id="s-loc">
+  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+    <div style="position:absolute;width:260px;height:260px;border-radius:50%;filter:blur(60px);background:rgba(196,144,42,.1);top:-60px;left:-40px;animation:float 9s ease-in-out infinite"></div>
+    <div style="position:absolute;width:200px;height:200px;border-radius:50%;filter:blur(60px);background:rgba(232,90,40,.07);bottom:80px;right:-30px;animation:float 11s ease-in-out infinite 3s"></div>
+  </div>
+  <div style="position:relative;z-index:2;flex:1;padding:44px 22px 22px;display:flex;flex-direction:column;overflow-y:auto">
+    <div style="display:flex;justify-content:center;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="22" height="22" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C4902A"/><stop offset="100%" stop-color="#F2C46D"/></linearGradient></defs><line x1="10" y1="3" x2="10" y2="16" stroke="url(#lg2)" stroke-width="3.2" stroke-linecap="round"/><line x1="18" y1="3" x2="18" y2="16" stroke="url(#lg2)" stroke-width="3.2" stroke-linecap="round"/><line x1="10" y1="16" x2="14" y2="22" stroke="url(#lg2)" stroke-width="3.2" stroke-linecap="round"/><line x1="18" y1="16" x2="14" y2="22" stroke="url(#lg2)" stroke-width="3.2" stroke-linecap="round"/><line x1="14" y1="22" x2="14" y2="37" stroke="url(#lg2)" stroke-width="3.2" stroke-linecap="round"/></svg>
+        <span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;background:linear-gradient(135deg,#C4902A,#F2C46D);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Yummigo</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:5px;align-items:center;justify-content:center;margin-bottom:22px">
+      <div style="width:22px;height:7px;border-radius:4px;background:var(--gold)"></div>
+      <div style="width:7px;height:7px;border-radius:50%;background:var(--s4)"></div>
+      <div style="width:7px;height:7px;border-radius:50%;background:var(--s4)"></div>
+    </div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:700;margin-bottom:5px">Where are you?</h2>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.6">Search any city worldwide — we have restaurants in 150+ countries.</p>
+    <div id="lo-auto" onclick="selLoc('auto')" style="display:flex;align-items:center;gap:13px;padding:15px;background:var(--gold-bg);border:1.5px solid var(--gold-b);border-radius:14px;cursor:pointer;margin-bottom:9px;transition:all .2s">
+      <span style="font-size:24px;flex-shrink:0">&#128205;</span>
+      <div style="flex:1"><div style="font-size:14px;font-weight:500">Auto-detect my location</div><div id="gps-label" style="font-size:12px;color:var(--muted);margin-top:2px">Detecting via GPS...</div></div>
+      <span id="gps-spinner" style="font-size:16px;animation:spin 1s linear infinite;flex-shrink:0">&#9696;</span>
+    </div>
+    <div id="lo-man" onclick="selLoc('man')" style="display:flex;align-items:center;gap:13px;padding:15px;background:var(--s2);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;margin-bottom:14px;transition:all .2s">
+      <span style="font-size:24px;flex-shrink:0">&#127758;</span>
+      <div><div style="font-size:14px;font-weight:500">Search any location</div><div style="font-size:12px;color:var(--muted);margin-top:2px">150+ countries &middot; 2000+ cities worldwide</div></div>
+    </div>
+    <div id="man-sel" style="display:none;margin-bottom:12px">
+      <div style="position:relative;margin-bottom:8px">
+        <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted);pointer-events:none">&#128269;</span>
+        <input id="loc-search" class="loc-search" placeholder="Search country, city, state..." oninput="filterLocations(this.value)" autocomplete="off">
+      </div>
+      <div class="country-list" id="country-list"></div>
+      <div id="sel-loc-display" style="display:none;margin-top:10px;padding:11px 14px;background:var(--gold-bg);border:1px solid var(--gold-b);border-radius:11px;font-size:13px;color:var(--gold);font-weight:500"></div>
+    </div>
+    <div style="flex:1;min-height:12px"></div>
+    <button class="btn" onclick="go('s-prefs')">Continue &#8594;</button>
+  </div>
+</div>
+
+<!-- ══ PREFERENCES ══ -->
+<div class="scr" id="s-prefs">
+  <div style="padding:14px 18px 0;flex-shrink:0">
+    <div style="display:flex;gap:5px;align-items:center;margin-bottom:14px">
+      <div style="width:7px;height:7px;border-radius:50%;background:var(--s4)"></div>
+      <div style="width:22px;height:7px;border-radius:4px;background:var(--gold)"></div>
+      <div style="width:7px;height:7px;border-radius:50%;background:var(--s4)"></div>
+    </div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:3px">Your taste profile</h2>
+    <p style="color:var(--muted);font-size:12px">Help our AI understand you perfectly.</p>
+  </div>
+  <div class="scroll" style="padding-top:14px">
+    <div id="pref-sections"></div>
+    <button class="btn" onclick="go('s-dishes')">Find My Dishes &#10022;</button>
+  </div>
+</div>
+
+<!-- ══ DISHES ══ -->
+<div class="scr" id="s-dishes">
+  <div class="ph">
+    <button class="bk" onclick="go('s-prefs')">&#8592;</button>
+    <div><div class="ph-t">Famous Dishes</div><div class="ph-s" id="dishes-loc-sub">&#128205; Worldwide &middot; All cuisines</div></div>
+  </div>
+  <div class="scroll">
+    <div class="ai-banner"><span style="font-size:20px">&#129302;</span><div style="font-size:12px;color:var(--muted);line-height:1.55"><strong style="color:var(--text)">AI discovered for you</strong><br>Top dishes loved by locals this week based on your preferences.</div></div>
+    <div class="slabel">Step 1: Choose a dish</div>
+    <div id="dish-list"></div>
+    <div onclick="toast('&#127922; AI picked: Agedashi Tofu — Hidden gem at Zen Garden!','green')" style="background:var(--gold-bg);border:1px dashed var(--gold-b);border-radius:14px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:13px;margin-bottom:16px;transition:transform .2s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">
+      <span style="font-size:26px">&#127922;</span>
+      <div><div style="font-size:14px;font-weight:600">Surprise Me!</div><div style="font-size:12px;color:var(--muted)">Let AI pick the perfect hidden gem for you</div></div>
+    </div>
+  </div>
+  <div class="bnav">
+    <button class="ni on" onclick="go('s-dishes')"><span class="ico">&#127968;</span>Discover</button>
+    <button class="ni" onclick="go('s-rests')"><span class="ico">&#128269;</span>Explore</button>
+    <button class="ni" onclick="go('s-group')"><span class="ico">&#128101;</span>Group</button>
+    <button class="ni" onclick="go('s-ai')"><span class="ico">&#129302;</span>AI Chat</button>
+    <button class="ni" onclick="go('s-admin')"><span class="ico">&#9881;</span>Admin</button>
+  </div>
+</div>
+
+<!-- ══ RESTAURANTS ══ -->
+<div class="scr" id="s-rests">
+  <div class="ph">
+    <button class="bk" onclick="go('s-dishes')">&#8592;</button>
+    <div><div class="ph-t">Step 2: Restaurants</div><div class="ph-s" id="rests-sub">8 places near you</div></div>
+  </div>
+  <div class="scroll"><div id="rest-list"></div></div>
+  <div class="bnav">
+    <button class="ni" onclick="go('s-dishes')"><span class="ico">&#127968;</span>Discover</button>
+    <button class="ni on"><span class="ico">&#128269;</span>Explore</button>
+    <button class="ni" onclick="go('s-group')"><span class="ico">&#128101;</span>Group</button>
+    <button class="ni" onclick="go('s-ai')"><span class="ico">&#129302;</span>AI Chat</button>
+    <button class="ni" onclick="go('s-admin')"><span class="ico">&#9881;</span>Admin</button>
+  </div>
+</div>
+
+<!-- ══ DETAIL ══ -->
+<div class="scr" id="s-detail">
+  <div id="detail-hero" style="height:200px;position:relative;flex-shrink:0;overflow:hidden">
+    <img id="detail-hero-img" src="" alt="" style="width:100%;height:100%;object-fit:cover">
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,var(--dark) 5%,rgba(0,0,0,.3) 60%,transparent)"></div>
+    <button class="bk" onclick="go('s-rests')" style="position:absolute;top:14px;left:14px;z-index:5;background:rgba(0,0,0,.5)">&#8592;</button>
+    <div id="detail-hero-name" style="position:absolute;bottom:14px;left:16px;right:16px;z-index:5"><div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6)"></div></div>
+  </div>
+  <div class="scroll" style="padding-top:12px"><div id="detail-body"></div></div>
+</div>
+
+<!-- ══ TABLE ══ -->
+<div class="scr" id="s-table">
+  <div class="ph">
+    <button class="bk" onclick="go('s-detail')">&#8592;</button>
+    <div><div class="ph-t">Reserve a Table</div><div class="ph-s" id="table-rest-name">Restaurant</div></div>
+  </div>
+  <div class="scroll">
+    <div style="background:var(--s2);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:13px">
+      <div class="mlabel" style="text-align:center">&#127968; Tap a table to reserve</div>
+      <div class="tbl-grid" id="tbl-grid"></div>
+      <div style="display:flex;gap:14px;justify-content:center;font-size:10px;color:var(--muted)">
+        <span style="color:var(--green)">&#128994; Available</span>
+        <span style="color:var(--gold)">&#128993; Reserved</span>
+        <span style="color:var(--red)">&#128308; Occupied</span>
+      </div>
+    </div>
+    <div style="background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:13px">
+      <div class="mlabel">Selected table</div>
+      <div class="row-b" style="margin-bottom:7px"><span style="font-size:12px;color:var(--muted)">Table</span><span id="sel-t-n" style="font-size:13px;font-weight:500">&#8212; tap above</span></div>
+      <div class="row-b" style="margin-bottom:7px"><span style="font-size:12px;color:var(--muted)">Capacity</span><span id="sel-t-c" style="font-size:13px;font-weight:500">&#8212;</span></div>
+      <div class="row-b"><span style="font-size:12px;color:var(--muted)">Status</span><span id="sel-t-s" style="font-size:13px;font-weight:500;color:var(--muted)">&#8212;</span></div>
+    </div>
+    <div style="display:flex;gap:9px;margin-bottom:12px">
+      <div style="flex:1"><label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Time</label>
+        <select class="finp"><option>7:00 PM</option><option>7:30 PM</option><option>8:00 PM</option><option>8:30 PM</option><option>9:00 PM</option></select></div>
+      <div style="flex:1"><label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Guests</label>
+        <select class="finp"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select></div>
+    </div>
+    <button class="btn" onclick="go('s-order')">Confirm &amp; Order Food &#8594;</button>
+  </div>
+</div>
+
+<!-- ══ ORDER ══ -->
+<div class="scr" id="s-order">
+  <div class="ph">
+    <button class="bk" onclick="go('s-detail')">&#8592;</button>
+    <div><div class="ph-t">Order Food</div><div class="ph-s" id="order-ph-sub">&#129681; Dine-In</div></div>
+  </div>
+  <!-- Mode tabs -->
+  <div style="display:flex;padding:12px 16px 0;gap:0;flex-shrink:0">
+    <button id="tab-dinein" class="mode-tab on" onclick="setOrderMode('dinein')" style="border-radius:11px 0 0 11px;border-right:none">&#129681; Dine-In</button>
+    <button id="tab-delivery" class="mode-tab" onclick="setOrderMode('delivery')" style="border-radius:0;border-left:none;border-right:none">&#128666; Delivery</button>
+    <button id="tab-takeout" class="mode-tab" onclick="setOrderMode('takeout')" style="border-radius:0 11px 11px 0;border-left:none">&#128717; Takeout</button>
+  </div>
+  <!-- Delivery address -->
+  <div id="delivery-wrap" style="display:none;padding:10px 16px 0;flex-shrink:0">
+    <div style="background:var(--s2);border:1px solid var(--border);border-radius:13px;padding:13px 15px">
+      <div class="mlabel">&#128666; Delivery Address</div>
+      <input id="delivery-addr" class="finp" placeholder="Enter your full delivery address..." style="margin-bottom:9px">
+      <select class="finp" style="font-size:13px">
+        <option>Standard delivery (45-60 min) — Free</option>
+        <option>Express delivery (20-30 min) — &#8377;49</option>
+        <option>Schedule for later</option>
+      </select>
+    </div>
+  </div>
+  <!-- Takeout info -->
+  <div id="takeout-wrap" style="display:none;padding:10px 16px 0;flex-shrink:0">
+    <div style="background:var(--blue-bg);border:1px solid var(--blue-b);border-radius:13px;padding:13px 15px;font-size:12px;color:var(--blue);line-height:1.6">
+      &#128717; Order packed for pickup at the counter. Estimated ready time: <strong>25–35 min</strong>.
+    </div>
+  </div>
+  <div class="scroll" style="padding-top:12px">
+    <div class="ai-banner"><span style="font-size:18px">&#128161;</span><div style="font-size:12px;color:var(--muted);line-height:1.55"><strong style="color:var(--text)">AI tip:</strong> 87% with your profile loved the Miso Ramen + Gyoza combo today.</div></div>
+    <div id="menu-list"></div>
+  </div>
+  <div id="cart-bar" style="display:none;position:absolute;bottom:0;left:0;right:0;padding:14px 16px 22px;background:linear-gradient(to top,var(--dark) 65%,transparent)">
+    <button class="btn" onclick="cartConfirm()" id="cart-btn">&#128722; Confirm Order &#8594;</button>
+  </div>
+</div>
+
+<!-- ══ ARRIVAL ══ -->
+<div class="scr" id="s-arrival">
+  <div class="ph">
+    <button class="bk" onclick="go('s-order')">&#8592;</button>
+    <div><div class="ph-t">&#127869; Dine-In Arrival</div><div class="ph-s">Smart kitchen sync</div></div>
+  </div>
+  <div class="scroll">
+    <div id="arrival-summary" style="background:var(--s2);border:1px solid var(--border);border-radius:15px;padding:14px 16px;margin-bottom:16px"></div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:12px">When do you expect to arrive?</div>
+    <div id="arr-now" onclick="selArr('now')" style="display:flex;align-items:flex-start;gap:13px;padding:14px;background:var(--gold-bg);border:1.5px solid var(--gold-b);border-radius:14px;cursor:pointer;margin-bottom:9px;transition:all .2s">
+      <span style="font-size:22px;flex-shrink:0">&#128694;</span><div><div style="font-size:14px;font-weight:500">Arriving now</div><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4">Start cooking immediately. Ready in ~24 min.</div></div>
+    </div>
+    <div id="arr-early" onclick="selArr('early')" style="display:flex;align-items:flex-start;gap:13px;padding:14px;background:var(--s2);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;margin-bottom:9px;transition:all .2s">
+      <span style="font-size:22px;flex-shrink:0">&#9193;</span><div><div style="font-size:14px;font-weight:500">Arriving early</div><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4">Ahead of schedule — kitchen speeds up.</div></div>
+    </div>
+    <div id="arr-time" onclick="selArr('time')" style="display:flex;align-items:flex-start;gap:13px;padding:14px;background:var(--s2);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;margin-bottom:9px;transition:all .2s">
+      <span style="font-size:22px;flex-shrink:0">&#128336;</span><div><div style="font-size:14px;font-weight:500">Arriving at a specific time</div><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4">Set your ETA — kitchen timed perfectly.</div></div>
+    </div>
+    <div id="eta-picker" style="display:none;background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:12px">
+      <div class="mlabel">Set your ETA</div>
+      <div style="display:flex;gap:9px;align-items:center;margin-bottom:10px">
+        <input type="time" id="eta-input" value="19:00" oninput="calcETA()" class="finp" style="flex:1">
+        <span class="badge bb" id="tz-badge">IST +5:30</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.55">Kitchen starts at <strong id="eta-start" style="color:var(--text)">6:36 PM</strong> so food is fresh on arrival.</div>
+    </div>
+    <button class="btn" onclick="go('s-timeline')">Confirm Arrival Plan &#8594;</button>
+  </div>
+</div>
+
+<!-- ══ TIMELINE ══ -->
+<div class="scr" id="s-timeline">
+  <div class="ph">
+    <button class="bk" onclick="go('s-order')">&#8592;</button>
+    <div><div class="ph-t">Your Order Journey</div></div>
+  </div>
+  <div class="scroll">
+    <div id="tl-status-banner" class="alert green"><span>&#10003;</span><span id="tl-status-text">Table reserved &middot; Kitchen notified &middot; ETA synced!</span></div>
+    <div class="stat-g" id="tl-stats"></div>
+    <div style="background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:14px">
+      <div class="mlabel" id="tl-steps-label">Kitchen timeline</div>
+      <div id="tl-steps"></div>
+    </div>
+    <div style="background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:14px">
+      <div class="mlabel">&#9889; Rescue Options</div>
+      <div class="rescue-g" id="rescue-grid"></div>
+    </div>
+    <button class="btn" onclick="go('s-dishes')">Done &#8212; Back to Discover</button>
+  </div>
+</div>
+
+<!-- ══ AI CHAT ══ -->
+<div class="scr" id="s-ai">
+  <div class="ph">
+    <button class="bk" onclick="go('s-dishes')">&#8592;</button>
+    <div><div class="ph-t">&#129302; Yummi AI</div><div class="ph-s"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px"></span>Online &middot; AI-powered</div></div>
+  </div>
+  <div class="chat-area" id="chat-area"></div>
+  <div style="padding:6px 12px 8px;display:flex;gap:6px;overflow-x:auto;flex-shrink:0">
+    <button onclick="sendQ('Surprise me with a hidden gem!')" style="padding:7px 13px;background:var(--s2);border:1px solid var(--border);border-radius:100px;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap">&#127922; Surprise</button>
+    <button onclick="sendQ('What pairs well with Veg Ramen?')" style="padding:7px 13px;background:var(--s2);border:1px solid var(--border);border-radius:100px;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap">&#127862; Pairings</button>
+    <button onclick="sendQ('Show trending dishes today')" style="padding:7px 13px;background:var(--s2);border:1px solid var(--border);border-radius:100px;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap">&#128293; Trending</button>
+    <button onclick="sendQ('Plan a romantic dinner for 2')" style="padding:7px 13px;background:var(--s2);border:1px solid var(--border);border-radius:100px;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap">&#128149; Romantic</button>
+    <button onclick="sendQ('Best budget options near me')" style="padding:7px 13px;background:var(--s2);border:1px solid var(--border);border-radius:100px;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap">&#128176; Budget</button>
+  </div>
+  <div style="padding:8px 12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;background:var(--dark)">
+    <input id="chat-inp" class="finp" placeholder="Ask Yummi anything..." onkeydown="if(event.key==='Enter')sendChat()" style="flex:1;border-radius:100px">
+    <button onclick="sendChat()" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#A87520,var(--gold));border:none;cursor:pointer;font-size:18px;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">&#8593;</button>
+  </div>
+  <div class="bnav">
+    <button class="ni" onclick="go('s-dishes')"><span class="ico">&#127968;</span>Discover</button>
+    <button class="ni" onclick="go('s-rests')"><span class="ico">&#128269;</span>Explore</button>
+    <button class="ni" onclick="go('s-group')"><span class="ico">&#128101;</span>Group</button>
+    <button class="ni on"><span class="ico">&#129302;</span>AI Chat</button>
+    <button class="ni" onclick="go('s-admin')"><span class="ico">&#9881;</span>Admin</button>
+  </div>
+</div>
+
+<!-- ══ GROUP ══ -->
+<div class="scr" id="s-group">
+  <div class="ph">
+    <button class="bk" onclick="go('s-dishes')">&#8592;</button>
+    <div><div class="ph-t">&#128101; Group Voting</div><div class="ph-s">4 friends &middot; 8 min left</div></div>
+  </div>
+  <div class="scroll">
+    <div class="ai-banner"><span style="font-size:20px">&#128499;</span><div style="font-size:12px;color:var(--muted);line-height:1.55"><strong style="color:var(--text)">Group session active</strong><br>Everyone votes, Yummi picks the best restaurant that works for all preferences.</div></div>
+    <div class="mlabel">Live votes</div>
+    <div style="background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:14px" id="vote-list"></div>
+    <div class="mlabel">Members</div>
+    <div id="member-list" style="margin-bottom:16px"></div>
+    <div class="mlabel">Your vote</div>
+    <div id="my-votes" style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px"></div>
+    <button class="btn" onclick="castVote()">Cast Vote &#10022;</button>
+    <button class="gbtn" onclick="toast('&#128228; Invite link copied!','green')" style="margin-top:9px">&#128228; Invite friends</button>
+  </div>
+  <div class="bnav">
+    <button class="ni" onclick="go('s-dishes')"><span class="ico">&#127968;</span>Discover</button>
+    <button class="ni" onclick="go('s-rests')"><span class="ico">&#128269;</span>Explore</button>
+    <button class="ni on"><span class="ico">&#128101;</span>Group</button>
+    <button class="ni" onclick="go('s-ai')"><span class="ico">&#129302;</span>AI Chat</button>
+    <button class="ni" onclick="go('s-admin')"><span class="ico">&#9881;</span>Admin</button>
+  </div>
+</div>
+
+<!-- ══ ADMIN ══ -->
+<div class="scr" id="s-admin">
+  <div class="ph">
+    <button class="bk" onclick="go('s-dishes')">&#8592;</button>
+    <div><div class="ph-t">&#9881; Admin Panel</div><div class="ph-s">Restaurant Management</div></div>
+  </div>
+  <div class="scroll" id="admin-body"></div>
+  <div class="bnav">
+    <button class="ni" onclick="go('s-dishes')"><span class="ico">&#127968;</span>Discover</button>
+    <button class="ni" onclick="go('s-rests')"><span class="ico">&#128269;</span>Explore</button>
+    <button class="ni" onclick="go('s-group')"><span class="ico">&#128101;</span>Group</button>
+    <button class="ni" onclick="go('s-ai')"><span class="ico">&#129302;</span>AI Chat</button>
+    <button class="ni on"><span class="ico">&#9881;</span>Admin</button>
+  </div>
+</div>
+
+</div>
+<script>
+// ═══════ STATE ═══════
+var ST={selDish:null,selRest:null,selTable:null,cart:{},arrMode:'now',orderMode:'dinein',myVote:null,votes:{0:3,1:2,2:1,3:0},toggles:{res:true,del:true,tak:true,ai:true,grp:false},demoOTP:'',selLoc:null};
+
+// ═══════ DATA ═══════
+var DISHES=[
+  {id:0,name:'Veg Ramen',img:'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&q=80',tags:['&#11088; 4.9','&#127807; Veg','#1 Globally'],match:97,desc:'Rich miso broth, bamboo shoots, mushrooms, silken tofu.',prep:'22 min'},
+  {id:1,name:'Vegetarian Sushi Platter',img:'https://images.unsplash.com/photo-1562802378-063ec186a863?w=600&q=80',tags:['&#11088; 4.7','&#127807; Veg','&#128293; Trending'],match:91,desc:'Avocado, cucumber, pickled radish rolls — artfully crafted.',prep:'15 min'},
+  {id:2,name:'Tempura Bento Box',img:'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&q=80',tags:['&#11088; 4.6','&#127807; Veg'],match:88,desc:'Crispy battered zucchini, sweet potato, lotus root.',prep:'25 min'},
+  {id:3,name:'Shoyu Tofu Bowl',img:'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=600&q=80',tags:['&#11088; 4.8','&#127807; Veg','Hidden Gem'],match:85,desc:'Soy broth, silken tofu, spring onion, sesame oil.',prep:'18 min'},
+];
+var RESTS=[
+  {id:0,name:'Sakura Ramen House',img:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80',match:96,rating:'4.9',wait:'10 min',dist:'1.2 km',tags:['&#127807; Veg Friendly','Famous Ramen'],intel:[['Most ordered','Veg Miso Ramen'],['Chef pick','Shoyu Tofu Bowl'],['Order with','Gyoza + Matcha']]},
+  {id:1,name:'Zen Garden Kitchen',img:'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80',match:89,rating:'4.7',wait:'5 min',dist:'0.8 km',tags:['&#127807; 100% Veg','Hidden Gem'],intel:[['Most ordered','Agedashi Tofu'],['Chef pick','Shoyu Ramen'],['Order with','Mochi + Green Tea']]},
+  {id:2,name:'Umami Studio',img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',match:82,rating:'4.5',wait:'20 min',dist:'2.1 km',tags:['&#128293; Trending'],intel:[['Most ordered','Spicy Miso Ramen'],['Chef pick','Karaage Bowl'],['Order with','Edamame']]},
+];
+var MENU=[
+  {id:0,name:'Veg Miso Ramen',img:'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&q=80',price:420,desc:'Rich umami broth, tofu, mushroom',prep:'22 min',pop:true},
+  {id:1,name:'Shoyu Tofu Bowl',img:'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=400&q=80',price:380,desc:'Soy broth, soft tofu, spring onion',prep:'18 min',pop:false},
+  {id:2,name:'Gyoza (6 pcs)',img:'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=400&q=80',price:240,desc:'Pan-fried veggie dumplings',prep:'12 min',pop:true},
+  {id:3,name:'Matcha Latte',img:'https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=400&q=80',price:180,desc:'Ceremonial stone-ground matcha',prep:'5 min',pop:false},
+  {id:4,name:'Tempura Bento Box',img:'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80',price:520,desc:'Assorted vegetable tempura + rice',prep:'25 min',pop:false},
+];
+var TABLES=[
+  {n:'T1',c:'2',s:'av'},{n:'T2',c:'4',s:'oc',t:'18m'},{n:'T3',c:'2',s:'av'},{n:'T4',c:'6',s:'rs'},
+  {n:'T5',c:'4',s:'av'},{n:'T6',c:'2',s:'oc',t:'30m'},{n:'T7',c:'4',s:'av'},{n:'T8',c:'8',s:'av'},
+  {n:'T9',c:'2',s:'rs'},{n:'T10',c:'4',s:'av'},{n:'T11',c:'2',s:'av'},{n:'T12',c:'6',s:'oc',t:'8m'},
+];
+var PREFS=[
+  {k:'diet',lbl:'&#127807; Diet',opts:['&#127807; Veg','&#127831; Non-Veg','&#127759; Both','&#129370; Eggetarian'],def:['&#127807; Veg']},
+  {k:'meal',lbl:'&#127869; Meal Type',opts:['&#9728; Breakfast','&#127780; Lunch','&#127769; Dinner','&#127856; Dessert','&#129360; Snacks'],def:['&#127780; Lunch']},
+  {k:'cuisine',lbl:'&#127758; Cuisine',opts:['Japanese','Indian','Korean','Chinese','Italian','Mexican','Thai','Mediterranean','French','American','Middle Eastern','Local'],def:['Japanese']},
+  {k:'mood',lbl:'&#10024; Mood',opts:['&#128524; Comfort','&#127775; Luxury','&#128149; Romantic','&#128106; Family','&#129365; Healthy','&#127881; Celebration','&#9889; Quick Bite'],def:['&#127775; Luxury']},
+  {k:'budget',lbl:'&#128176; Budget',opts:['&#129691; Low','&#128181; Medium','&#128142; Premium'],def:['&#128181; Medium']},
+];
+var PREFS_SEL={};
+PREFS.forEach(function(p){PREFS_SEL[p.k]=p.def.slice();});
+
+var VOTE_D=[{e:'&#127836;',n:'Veg Ramen'},{e:'&#127843;',n:'Sushi Platter'},{e:'&#129425;',n:'Gyoza Set'},{e:'&#129379;',n:'Tofu Bowl'}];
+var MEMBERS=[
+  {i:'PS',c:'#C4902A',n:'Priya S.',v:'Veg Ramen',d:true},
+  {i:'AR',c:'#2DB87A',n:'Arjun R.',v:'Sushi Platter',d:true},
+  {i:'MK',c:'#3A8FE0',n:'Meera K.',v:'Veg Ramen',d:true},
+  {i:'YO',c:'#8F6AE0',n:'You',v:'Voting...',d:false},
+];
+var AI_R={
+  surprise:'&#127922; Hidden gem alert!\n\nAgedashi Tofu at Zen Garden Kitchen — only locals know this one. 91% match for your profile. Light, crispy, deeply umami.\n\nWant me to book a table?',
+  pair:'&#127862; Best pairings for Veg Miso Ramen:\n&#8226; Gyoza (pan-fried)\n&#8226; Matcha latte to cleanse the palate\n&#8226; Pickled ginger starter\n&#8226; Edamame as a snack\n\nShall I add these to your order?',
+  trend:'&#128293; Trending worldwide right now:\n1. Veg Ramen — +34% orders today\n2. Avocado Sushi — New 5.0 rating\n3. Tempura Bento — Chef special\n4. Mochi Ice Cream — Dessert hit\n\nWant to visit any of these?',
+  romantic:'&#128149; Romantic dinner for 2:\n&#8226; Zen Garden Kitchen — private booths, dim lighting\n&#8226; Veg Omakase set x2\n&#8226; Matcha dessert pairing\n&#8226; 8:00 PM slot available tonight\n\nShall I reserve the corner booth?',
+  budget:'&#128176; Best budget options near you:\n&#8226; Sakura Express — Ramen bowl &#8377;220\n&#8226; Tofu Corner — Set meal &#8377;180\n&#8226; Sushi Bar Mini — 6pc platter &#8377;260\n\nAll under &#8377;300 and highly rated!',
+  def:'Found 6 great matches for your taste profile! &#10024;\n\nTop pick: Sakura Ramen House — 96% match, known for their veg-friendly luxury experience.\n\nWant the full list?'
+};
+var chatMsgs=[
+  {r:'ai',t:'Hey! I\'m Yummi, your AI dining companion &#127836;\n\nAsk me anything — what to eat, where to go, or let me plan your entire meal!'},
+  {r:'user',t:'I\'m in the mood for something warm and veg-friendly.'},
+  {r:'ai',t:'Based on your profile (Veg &#8226; Luxury &#8226; Japanese):\n\n&#127836; Veg Miso Ramen at Sakura Ramen House — 97% match!\n&#127843; Avocado Sushi Platter at Zen Garden — 91% match\n\nWant me to book a table?'},
+];
+var aiInited=false,toastTmr;
+
+// ═══════ LOCATIONS DATA ═══════
+var LOCATIONS=[
+  {flag:'&#127470;&#127475;',c:'India',cities:['Mumbai','Delhi','Bangalore','Chennai','Hyderabad','Kolkata','Pune','Ahmedabad','Jaipur','Surat','Lucknow','Kochi','Chandigarh','Indore','Bhopal','Nagpur','Visakhapatnam','Coimbatore','Thiruvananthapuram','Mysuru']},
+  {flag:'&#127471;&#127477;',c:'Japan',cities:['Tokyo','Osaka','Kyoto','Yokohama','Nagoya','Sapporo','Fukuoka','Kobe','Hiroshima','Sendai','Nara','Okinawa']},
+  {flag:'&#127482;&#127480;',c:'United States',cities:['New York','Los Angeles','Chicago','Houston','Phoenix','San Francisco','Seattle','Miami','Boston','Dallas','Atlanta','Denver','Las Vegas','Portland','Nashville','Austin','San Diego','Philadelphia']},
+  {flag:'&#127468;&#127463;',c:'United Kingdom',cities:['London','Manchester','Birmingham','Leeds','Glasgow','Edinburgh','Liverpool','Bristol','Sheffield','Cardiff','Belfast','Nottingham']},
+  {flag:'&#127462;&#127482;',c:'Australia',cities:['Sydney','Melbourne','Brisbane','Perth','Adelaide','Canberra','Gold Coast','Newcastle','Hobart','Darwin']},
+  {flag:'&#127464;&#127462;',c:'Canada',cities:['Toronto','Vancouver','Montreal','Calgary','Ottawa','Edmonton','Quebec City','Winnipeg','Halifax']},
+  {flag:'&#127467;&#127479;',c:'France',cities:['Paris','Lyon','Marseille','Toulouse','Nice','Nantes','Strasbourg','Bordeaux','Lille','Montpellier']},
+  {flag:'&#127470;&#127481;',c:'Italy',cities:['Rome','Milan','Naples','Turin','Florence','Venice','Bologna','Genoa','Palermo','Bari']},
+  {flag:'&#127472;&#127479;',c:'South Korea',cities:['Seoul','Busan','Incheon','Daegu','Daejeon','Gwangju','Suwon','Jeju']},
+  {flag:'&#127464;&#127475;',c:'China',cities:['Shanghai','Beijing','Guangzhou','Shenzhen','Chengdu','Hangzhou',"Xi'an",'Wuhan','Nanjing','Tianjin']},
+  {flag:'&#127480;&#127468;',c:'Singapore',cities:['Singapore City','Jurong East','Tampines','Woodlands','Punggol']},
+  {flag:'&#127462;&#127466;',c:'UAE',cities:['Dubai','Abu Dhabi','Sharjah','Ajman','Ras Al Khaimah','Al Ain']},
+  {flag:'&#127481;&#127469;',c:'Thailand',cities:['Bangkok','Chiang Mai','Pattaya','Phuket','Hat Yai','Chiang Rai']},
+  {flag:'&#127474;&#127486;',c:'Malaysia',cities:['Kuala Lumpur','George Town','Johor Bahru','Ipoh','Kota Kinabalu','Kuching']},
+  {flag:'&#127470;&#127465;',c:'Indonesia',cities:['Jakarta','Surabaya','Bandung','Medan','Bali','Yogyakarta','Makassar']},
+  {flag:'&#127463;&#127479;',c:'Brazil',cities:['Sao Paulo','Rio de Janeiro','Brasilia','Salvador','Fortaleza','Belo Horizonte','Curitiba']},
+  {flag:'&#127474;&#127485;',c:'Mexico',cities:['Mexico City','Guadalajara','Monterrey','Puebla','Cancun','Tijuana','Merida']},
+  {flag:'&#127465;&#127466;',c:'Germany',cities:['Berlin','Munich','Hamburg','Frankfurt','Cologne','Stuttgart','Dusseldorf','Leipzig']},
+  {flag:'&#127466;&#127480;',c:'Spain',cities:['Madrid','Barcelona','Valencia','Seville','Bilbao','Granada','Malaga','Zaragoza']},
+  {flag:'&#127475;&#127473;',c:'Netherlands',cities:['Amsterdam','Rotterdam','The Hague','Utrecht','Eindhoven','Groningen']},
+  {flag:'&#127480;&#127462;',c:'Saudi Arabia',cities:['Riyadh','Jeddah','Mecca','Medina','Dammam','Khobar']},
+  {flag:'&#127481;&#127479;',c:'Turkey',cities:['Istanbul','Ankara','Izmir','Bursa','Antalya','Adana','Gaziantep']},
+  {flag:'&#127480;&#127466;',c:'Sweden',cities:['Stockholm','Gothenburg','Malmo','Uppsala','Vasteras']},
+  {flag:'&#127475;&#127487;',c:'New Zealand',cities:['Auckland','Wellington','Christchurch','Hamilton','Tauranga']},
+  {flag:'&#127480;&#127462;',c:'South Africa',cities:['Johannesburg','Cape Town','Durban','Pretoria','Port Elizabeth','Bloemfontein']},
+  {flag:'&#127466;&#127468;',c:'Egypt',cities:['Cairo','Alexandria','Giza','Luxor','Hurghada','Aswan']},
+  {flag:'&#127475;&#127468;',c:'Nigeria',cities:['Lagos','Abuja','Kano','Ibadan','Port Harcourt','Benin City']},
+  {flag:'&#127480;&#127474;',c:'Sri Lanka',cities:['Colombo','Kandy','Galle','Negombo','Jaffna']},
+  {flag:'&#127463;&#127465;',c:'Bangladesh',cities:['Dhaka','Chittagong','Sylhet','Khulna','Rajshahi']},
+  {flag:'&#127477;&#127472;',c:'Pakistan',cities:['Karachi','Lahore','Islamabad','Rawalpindi','Faisalabad','Multan']},
+  {flag:'&#127477;&#127469;',c:'Philippines',cities:['Manila','Cebu','Davao','Quezon City','Makati','Pasig']},
+  {flag:'&#127483;&#127475;',c:'Vietnam',cities:['Ho Chi Minh City','Hanoi','Da Nang','Can Tho','Hue']},
+  {flag:'&#127474;&#127486;',c:'Myanmar',cities:['Yangon','Mandalay','Naypyidaw','Bago']},
+  {flag:'&#127472;&#127469;',c:'Cambodia',cities:['Phnom Penh','Siem Reap','Sihanoukville']},
+  {flag:'&#127481;&#127487;',c:'Tanzania',cities:['Dar es Salaam','Dodoma','Zanzibar','Arusha','Mwanza']},
+  {flag:'&#127472;&#127466;',c:'Kenya',cities:['Nairobi','Mombasa','Kisumu','Nakuru','Eldoret']},
+  {flag:'&#127466;&#127481;',c:'Ethiopia',cities:['Addis Ababa','Dire Dawa','Gondar','Mekelle']},
+  {flag:'&#127462;&#127479;',c:'Argentina',cities:['Buenos Aires','Cordoba','Rosario','Mendoza','Tucuman']},
+  {flag:'&#127464;&#127473;',c:'Colombia',cities:['Bogota','Medellin','Cali','Barranquilla','Cartagena']},
+  {flag:'&#127477;&#127466;',c:'Peru',cities:['Lima','Arequipa','Trujillo','Cusco','Chiclayo']},
+];
+
+// ═══════ CANVAS ANIMATION ═══════
+(function(){
+  var canvas=document.getElementById('login-canvas');
+  if(!canvas)return;
+  var ctx=canvas.getContext('2d');
+  function resize(){canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;}
+  resize();window.addEventListener('resize',resize);
+  var particles=[];
+  for(var i=0;i<55;i++){
+    particles.push({
+      x:Math.random()*canvas.width,y:Math.random()*canvas.height,
+      r:Math.random()*2.5+.8,
+      vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,
+      alpha:Math.random()*.45+.1,
+      color:Math.random()>.5?'196,144,42':'242,198,109'
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(var a=0;a<particles.length;a++){
+      for(var b=a+1;b<particles.length;b++){
+        var dx=particles[a].x-particles[b].x,dy=particles[a].y-particles[b].y;
+        var d=Math.sqrt(dx*dx+dy*dy);
+        if(d<88){ctx.beginPath();ctx.strokeStyle='rgba(196,144,42,'+(0.13*(1-d/88))+')';ctx.lineWidth=.8;ctx.moveTo(particles[a].x,particles[a].y);ctx.lineTo(particles[b].x,particles[b].y);ctx.stroke();}
+      }
+    }
+    particles.forEach(function(p){
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>canvas.width)p.vx*=-1;
+      if(p.y<0||p.y>canvas.height)p.vy*=-1;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba('+p.color+','+p.alpha+')';ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// GPS sim
+setTimeout(function(){
+  var lbl=document.getElementById('gps-label'),sp=document.getElementById('gps-spinner');
+  if(lbl){lbl.textContent='GPS ready — location detected';lbl.style.color='var(--green)';}
+  if(sp)sp.style.display='none';
+},1600);
+
+// ═══════ NAVIGATION ═══════
+function go(id){
+  document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('active');});
+  var el=document.getElementById(id);if(!el)return;el.classList.add('active');
+  if(id==='s-dishes')buildDishes();
+  else if(id==='s-rests')buildRests();
+  else if(id==='s-detail')buildDetail();
+  else if(id==='s-table')buildTable();
+  else if(id==='s-order')buildMenu();
+  else if(id==='s-arrival')buildArrivalSummary();
+  else if(id==='s-timeline')buildTimeline();
+  else if(id==='s-ai'&&!aiInited){aiInited=true;renderChat();}
+  else if(id==='s-group')buildGroup();
+  else if(id==='s-admin')buildAdmin();
+}
+
+// ═══════ TOAST ═══════
+function toast(msg,type){
+  var el=document.getElementById('toast');el.innerHTML=msg;
+  var c={green:['#2DB87A','rgba(45,184,122,.4)'],blue:['#4A9AE8','rgba(74,154,232,.4)'],amber:['#D4A020','rgba(212,160,32,.4)'],red:['#E05252','rgba(224,82,82,.4)']}[type||'green'];
+  el.style.background=c[0];el.style.boxShadow='0 4px 24px '+c[1];el.style.display='block';el.style.animation='toastIn .3s ease';
+  clearTimeout(toastTmr);toastTmr=setTimeout(function(){el.style.display='none';},2800);
+}
+
+// ═══════ OTP ═══════
+function sendOTP(){
+  var phone=document.getElementById('phone-input').value.trim();
+  var dial=document.getElementById('dial-code').value;
+  if(phone.length<6){
+    document.getElementById('phone-input').style.borderColor='var(--red)';
+    setTimeout(function(){document.getElementById('phone-input').style.borderColor='';},2000);
+    toast('&#9888; Enter a valid mobile number','red');return;
+  }
+  ST.demoOTP=Math.floor(100000+Math.random()*900000).toString();
+  document.getElementById('demo-otp-display').textContent=ST.demoOTP;
+  document.getElementById('otp-sent-to').textContent='Sent to '+dial+' '+phone;
+  document.getElementById('login-form').style.display='none';
+  document.getElementById('otp-form').style.display='block';
+  toast('&#128241; OTP sent to '+dial+' '+phone,'green');
+  setTimeout(function(){var b=document.getElementById('otp0');if(b)b.focus();},300);
+}
+function backToLogin(){document.getElementById('otp-form').style.display='none';document.getElementById('login-form').style.display='block';}
+function otpNext(idx){
+  var val=document.getElementById('otp'+idx).value.replace(/\D/g,'');
+  document.getElementById('otp'+idx).value=val;
+  if(val&&idx<5)setTimeout(function(){document.getElementById('otp'+(idx+1)).focus();},40);
+  var full='';for(var i=0;i<6;i++)full+=(document.getElementById('otp'+i).value||'');
+  if(full.length===6)setTimeout(verifyOTP,300);
+}
+function otpBack(e,idx){if(e.key==='Backspace'&&!document.getElementById('otp'+idx).value&&idx>0)document.getElementById('otp'+(idx-1)).focus();}
+function verifyOTP(){
+  var entered='';for(var i=0;i<6;i++)entered+=(document.getElementById('otp'+i).value||'');
+  if(entered===ST.demoOTP||entered==='123456'){
+    toast('&#9989; Verified! Welcome to Yummigo','green');
+    setTimeout(function(){go('s-loc');},700);
+  } else {
+    document.querySelectorAll('.otp-box').forEach(function(b){b.style.borderColor='var(--red)';});
+    setTimeout(function(){document.querySelectorAll('.otp-box').forEach(function(b){b.style.borderColor='';});},700);
+    toast('&#10060; Wrong OTP. Check the demo OTP shown above','red');
+  }
+}
+function resendOTP(){
+  ST.demoOTP=Math.floor(100000+Math.random()*900000).toString();
+  document.getElementById('demo-otp-display').textContent=ST.demoOTP;
+  for(var i=0;i<6;i++){var b=document.getElementById('otp'+i);if(b)b.value='';}
+  document.getElementById('otp0').focus();
+  toast('&#128201; New OTP generated!','amber');
+}
+
+// ═══════ LOCATION ═══════
+function selLoc(t){
+  var a=document.getElementById('lo-auto'),m=document.getElementById('lo-man'),ms=document.getElementById('man-sel');
+  if(t==='auto'){
+    a.style.background='var(--gold-bg)';a.style.border='1.5px solid var(--gold-b)';
+    m.style.background='var(--s2)';m.style.border='1.5px solid var(--border)';
+    ms.style.display='none';
+  } else {
+    m.style.background='var(--gold-bg)';m.style.border='1.5px solid var(--gold-b)';
+    a.style.background='var(--s2)';a.style.border='1.5px solid var(--border)';
+    ms.style.display='block';
+    filterLocations('');
+    setTimeout(function(){var el=document.getElementById('loc-search');if(el)el.focus();},200);
+  }
+}
+
+function filterLocations(q){
+  var list=document.getElementById('country-list');if(!list)return;
+  var h='',count=0,ql=(q||'').toLowerCase().trim();
+  LOCATIONS.forEach(function(loc){
+    if(count>100)return;
+    var mc=loc.c.toLowerCase().includes(ql);
+    if(!ql){
+      // Show all countries with their cities
+      h+='<div class="country-hdr">'+loc.flag+' '+loc.c+'</div>';
+      loc.cities.forEach(function(city){
+        if(count>100)return;
+        h+='<div class="country-item" onclick="pickLocation(\''+loc.flag+'\',\''+loc.c+'\',\''+city+'\')" style="padding-left:22px">&#128205; '+city+'</div>';
+        count++;
+      });
+    } else if(mc){
+      h+='<div class="country-item" onclick="pickLocation(\''+loc.flag+'\',\''+loc.c+'\',\'\')">'+loc.flag+' <strong>'+loc.c+'</strong> — all cities</div>';
+      count++;
+      loc.cities.forEach(function(city){
+        if(count>100)return;
+        h+='<div class="country-item" onclick="pickLocation(\''+loc.flag+'\',\''+loc.c+'\',\''+city+'\')" style="padding-left:22px">&#128205; '+city+'</div>';
+        count++;
+      });
+    } else {
+      loc.cities.forEach(function(city){
+        if(count>100)return;
+        if(city.toLowerCase().includes(ql)){
+          h+='<div class="country-item" onclick="pickLocation(\''+loc.flag+'\',\''+loc.c+'\',\''+city+'\')">'+loc.flag+' '+city+', <strong>'+loc.c+'</strong></div>';
+          count++;
+        }
+      });
+    }
+  });
+  if(!h)h='<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">No results for "'+q+'"</div>';
+  list.innerHTML=h;
+}
+
+function pickLocation(flag,country,city){
+  var disp=city?city+', '+country:country;
+  ST.selLoc={flag:flag,country:country,city:city,display:disp};
+  var srch=document.getElementById('loc-search');if(srch)srch.value=disp;
+  var cl=document.getElementById('country-list');if(cl)cl.innerHTML='';
+  var dsp=document.getElementById('sel-loc-display');
+  if(dsp){dsp.innerHTML='&#128205; <strong>'+flag+' '+disp+'</strong>';dsp.style.display='block';}
+  var sub=document.getElementById('dishes-loc-sub');
+  if(sub)sub.innerHTML='&#128205; '+disp+' &middot; Veg &middot; Japanese';
+  toast('&#128205; '+flag+' '+disp,'green');
+}
+
+// ═══════ PREFERENCES ═══════
+(function(){
+  var el=document.getElementById('pref-sections');if(!el)return;
+  var h='';
+  PREFS.forEach(function(p){
+    h+='<div style="margin-bottom:20px"><div class="mlabel">'+p.lbl+'</div><div style="display:flex;flex-wrap:wrap;gap:7px">';
+    p.opts.forEach(function(o){var on=PREFS_SEL[p.k].indexOf(o)>-1;h+='<button class="chip'+(on?' on':'')+'" onclick="tPref(\''+p.k+'\',\''+o+'\',this)">'+o+'</button>';});
+    h+='</div></div>';
+  });
+  el.innerHTML=h;
+})();
+function tPref(k,v,el){var i=PREFS_SEL[k].indexOf(v);if(i>-1)PREFS_SEL[k].splice(i,1);else PREFS_SEL[k].push(v);el.classList.toggle('on');}
+
+// ═══════ DISHES ═══════
+function buildDishes(){
+  var el=document.getElementById('dish-list');if(!el)return;var h='';
+  DISHES.forEach(function(d,idx){
+    h+='<div class="card cl" onclick="selDish('+d.id+')" style="margin-bottom:14px;animation:fadeUp .4s ease '+(idx*0.08)+'s both">';
+    h+='<div class="dish-img-wrap"><img src="'+d.img+'" alt="'+d.name+'" loading="lazy" onerror="this.style.display=\'none\'">';
+    h+='<div class="dish-img-overlay"></div></div>';
+    h+='<div class="cb"><div style="font-family:\'Playfair Display\',serif;font-size:18px;font-weight:700;margin-bottom:7px">'+d.name+'</div>';
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">';
+    d.tags.forEach(function(t){h+='<span class="badge bgo">'+t+'</span>';});
+    h+='</div>';
+    h+='<div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:8px">'+d.desc+'</div>';
+    h+='<div style="font-size:11px;color:var(--muted);margin-bottom:10px">&#9202; Prep: <strong style="color:var(--text)">'+d.prep+'</strong></div>';
+    h+='<div class="mbar"><div class="mbar-lbl"><span>AI Match</span><span>'+d.match+'%</span></div>';
+    h+='<div class="mtrack"><div class="mfill" style="--w:'+d.match+'%"></div></div></div></div></div>';
+  });
+  el.innerHTML=h;
+}
+function selDish(id){ST.selDish=DISHES[id];var s=document.getElementById('rests-sub');if(s)s.textContent='8 places serving '+DISHES[id].name;go('s-rests');}
+
+// ═══════ RESTAURANTS ═══════
+function buildRests(){
+  var el=document.getElementById('rest-list');if(!el)return;var h='';
+  RESTS.forEach(function(r,idx){
+    h+='<div class="card cl" onclick="selRest('+r.id+')" style="margin-bottom:14px;animation:fadeUp .4s ease '+(idx*0.1)+'s both">';
+    h+='<div class="rest-img-wrap"><img src="'+r.img+'" alt="'+r.name+'" loading="lazy" onerror="this.style.display=\'none\'">';
+    h+='<div style="position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#A87520,var(--gold));color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px">'+r.match+'%</div>';
+    h+='</div><div class="cb">';
+    h+='<div style="font-size:16px;font-weight:600;margin-bottom:6px">'+r.name+'</div>';
+    h+='<div style="display:flex;gap:12px;font-size:11px;color:var(--muted);margin-bottom:8px">';
+    h+='<span>&#11088; <strong style="color:var(--text)">'+r.rating+'</strong></span>';
+    h+='<span>&#128336; <strong style="color:var(--text)">'+r.wait+'</strong></span>';
+    h+='<span>&#128205; <strong style="color:var(--text)">'+r.dist+'</strong></span></div>';
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    r.tags.forEach(function(t){h+='<span class="badge bg">'+t+'</span>';});
+    h+='</div></div></div>';
+  });
+  el.innerHTML=h;
+}
+function selRest(id){ST.selRest=RESTS[id];go('s-detail');}
+
+// ═══════ DETAIL ═══════
+function buildDetail(){
+  var r=ST.selRest||RESTS[0];
+  var img=document.getElementById('detail-hero-img');if(img)img.src=r.img;
+  var nm=document.querySelector('#detail-hero-name div');if(nm)nm.textContent=r.name;
+  var tn=document.getElementById('table-rest-name');if(tn)tn.textContent=r.name;
+  var h='';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">';
+  [['&#11088;',r.rating],['&#128336;',r.wait],['&#128205;',r.dist],['&#128101;','Moderate']].forEach(function(s){
+    h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font-size:11px;color:var(--muted)">'+s[0]+' <strong style="color:var(--text)">'+s[1]+'</strong></div>';
+  });
+  h+='</div>';
+  // Menu preview
+  h+='<div style="margin-bottom:14px"><div class="mlabel">&#127860; Menu highlights</div>';
+  h+='<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px">';
+  MENU.slice(0,4).forEach(function(item){
+    h+='<div style="flex-shrink:0;width:110px;background:var(--s2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer" onclick="go(\'s-order\')">';
+    h+='<img src="'+item.img+'" alt="'+item.name+'" style="width:100%;height:70px;object-fit:cover" loading="lazy">';
+    h+='<div style="padding:7px 9px"><div style="font-size:11px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+item.name+'</div>';
+    h+='<div style="font-size:11px;color:var(--gold);font-weight:600">&#8377;'+item.price+'</div></div></div>';
+  });
+  h+='</div></div>';
+  h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:14px">';
+  h+='<div class="mlabel">&#128293; Dish intelligence</div>';
+  r.intel.forEach(function(p){h+='<div class="row-b" style="margin-bottom:8px"><span style="font-size:12px;color:var(--muted)">'+p[0]+'</span><span style="font-size:12px;color:var(--gold);font-weight:500">'+p[1]+'</span></div>';});
+  h+='</div>';
+  h+='<div style="display:flex;gap:9px;margin-bottom:12px">';
+  h+='<button class="btn" style="flex:1" onclick="go(\'s-table\')">Book Table</button>';
+  h+='<button class="gbtn" style="flex:1" onclick="go(\'s-order\')">Order Food</button></div>';
+  h+='<button class="gbtn" onclick="go(\'s-group\')" style="gap:10px;justify-content:flex-start">&#128101; Start Group Vote</button>';
+  document.getElementById('detail-body').innerHTML=h;
+}
+
+// ═══════ TABLE ═══════
+function buildTable(){
+  var grid=document.getElementById('tbl-grid');if(!grid)return;grid.innerHTML='';
+  TABLES.forEach(function(t){
+    var btn=document.createElement('button');
+    btn.className='tbl-btn '+t.s;
+    btn.innerHTML='<span style="font-size:13px;font-weight:700">'+t.n+'</span><span style="font-size:9px">'+t.c+'p</span>'+(t.t?'<span style="font-size:8px">'+t.t+'</span>':'');
+    if(t.s==='av'){btn.onclick=function(){document.querySelectorAll('.tbl-btn.av').forEach(function(b){b.classList.remove('pk');});btn.classList.add('pk');ST.selTable=t;document.getElementById('sel-t-n').textContent=t.n;document.getElementById('sel-t-c').textContent=t.c+' persons';document.getElementById('sel-t-s').innerHTML='<span style="color:var(--green)">&#10003; Available</span>';toast('&#128515; Table '+t.n+' selected','green');};}
+    grid.appendChild(btn);
+  });
+}
+
+// ═══════ ORDER / MENU ═══════
+function buildMenu(){
+  // reset mode to dine-in visually
+  setOrderMode(ST.orderMode||'dinein',true);
+  var el=document.getElementById('menu-list');if(!el)return;var h='';
+  MENU.forEach(function(item){
+    var q=ST.cart[item.id]||0;
+    h+='<div style="display:flex;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--border)">';
+    h+='<div style="width:70px;height:70px;border-radius:13px;overflow:hidden;flex-shrink:0;position:relative">';
+    h+='<img src="'+item.img+'" alt="'+item.name+'" style="width:100%;height:100%;object-fit:cover" loading="lazy">';
+    if(item.pop)h+='<div style="position:absolute;top:3px;right:3px;background:var(--gold);border-radius:100px;font-size:8px;padding:2px 5px;color:#fff;font-weight:600">HOT</div>';
+    h+='</div><div style="flex:1">';
+    h+='<div style="font-size:14px;font-weight:500;margin-bottom:2px">'+item.name+'</div>';
+    h+='<div style="font-size:13px;color:var(--gold);font-weight:600;margin-bottom:2px">&#8377;'+item.price+'</div>';
+    h+='<div style="font-size:11px;color:var(--muted);margin-bottom:7px">'+item.desc+' &middot; '+item.prep+'</div>';
+    h+='<div style="display:flex;align-items:center;gap:8px">';
+    h+='<button onclick="adjCart('+item.id+',-1)" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:var(--s3);color:var(--text);font-size:18px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center">&#8722;</button>';
+    h+='<span id="qty-'+item.id+'" style="font-size:14px;font-weight:700;min-width:18px;text-align:center">'+q+'</span>';
+    h+='<button onclick="adjCart('+item.id+',1)" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--gold-b);background:var(--gold-bg);color:var(--gold);font-size:18px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center">+</button>';
+    h+='</div></div></div>';
+  });
+  el.innerHTML=h;
+  updCart();
+}
+function adjCart(id,d){
+  ST.cart[id]=Math.max(0,(ST.cart[id]||0)+d);
+  var q=document.getElementById('qty-'+id);if(q)q.textContent=ST.cart[id];
+  updCart();
+}
+function updCart(){
+  var cnt=0,tot=0;
+  MENU.forEach(function(i){var q=ST.cart[i.id]||0;cnt+=q;tot+=q*i.price;});
+  var bar=document.getElementById('cart-bar'),btn=document.getElementById('cart-btn');
+  if(cnt>0){
+    bar.style.display='block';
+    var ico=ST.orderMode==='delivery'?'&#128666;':ST.orderMode==='takeout'?'&#128717;':'&#128722;';
+    btn.innerHTML=ico+' '+cnt+' item'+(cnt>1?'s':'')+' &middot; &#8377;'+tot+' &mdash; Confirm &#8594;';
+  } else bar.style.display='none';
+}
+function setOrderMode(mode,silent){
+  ST.orderMode=mode;
+  var tabs={dinein:'tab-dinein',delivery:'tab-delivery',takeout:'tab-takeout'};
+  Object.keys(tabs).forEach(function(k){
+    var btn=document.getElementById(tabs[k]);if(!btn)return;
+    if(k===mode)btn.classList.add('on');else btn.classList.remove('on');
+  });
+  var dw=document.getElementById('delivery-wrap');
+  var tw=document.getElementById('takeout-wrap');
+  if(dw)dw.style.display=mode==='delivery'?'block':'none';
+  if(tw)tw.style.display=mode==='takeout'?'block':'none';
+  var sub=document.getElementById('order-ph-sub');
+  var r=ST.selRest||RESTS[0];
+  var labels={dinein:'&#129681; Dine-In &middot; '+r.name,delivery:'&#128666; Delivery &middot; '+r.name,takeout:'&#128717; Takeout &middot; '+r.name};
+  if(sub)sub.innerHTML=labels[mode];
+  updCart();
+  if(!silent){
+    var msgs={dinein:'&#129681; Dine-In selected — food served at your table',delivery:'&#128666; Delivery — enter your address below',takeout:'&#128717; Takeout — pick up from counter'};
+    toast(msgs[mode],mode==='dinein'?'green':'blue');
+  }
+}
+function cartConfirm(){
+  var cnt=0;MENU.forEach(function(i){cnt+=ST.cart[i.id]||0;});
+  if(cnt===0){toast('&#9888; Add at least one item','amber');return;}
+  if(ST.orderMode==='delivery'){
+    var addr=document.getElementById('delivery-addr');
+    if(addr&&!addr.value.trim()){
+      addr.style.borderColor='var(--red)';
+      setTimeout(function(){if(addr)addr.style.borderColor='';},2000);
+      toast('&#9888; Please enter your delivery address','red');return;
+    }
+    go('s-timeline');
+  } else if(ST.orderMode==='takeout'){
+    go('s-timeline');
+  } else {
+    go('s-arrival');
+  }
+}
+
+// ═══════ ARRIVAL ═══════
+function buildArrivalSummary(){
+  var tot=0,lines='';
+  MENU.forEach(function(i){var q=ST.cart[i.id]||0;if(q){tot+=q*i.price;lines+='<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">'+i.name+' &times;'+q+'</span><span style="font-weight:500">&#8377;'+(q*i.price)+'</span></div>';}});
+  if(!lines){lines='<div style="font-size:12px;color:var(--muted)">Veg Miso Ramen &times;2, Gyoza &times;1</div>';tot=1080;}
+  var el=document.getElementById('arrival-summary');
+  if(el)el.innerHTML='<div class="mlabel">Order confirmed</div>'+lines+'<div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px;display:flex;justify-content:space-between"><span style="font-size:13px;color:var(--muted)">Total</span><span style="font-size:17px;font-weight:700;color:var(--gold)">&#8377;'+tot+'</span></div>';
+}
+function selArr(m){
+  ST.arrMode=m;
+  ['now','early','time'].forEach(function(x){
+    var el=document.getElementById('arr-'+x);if(!el)return;
+    el.style.background=x===m?'var(--gold-bg)':'var(--s2)';
+    el.style.border='1.5px solid '+(x===m?'var(--gold-b)':'var(--border)');
+  });
+  var ep=document.getElementById('eta-picker');if(ep)ep.style.display=m==='time'?'block':'none';
+}
+function calcETA(){
+  var v=document.getElementById('eta-input').value;if(!v)return;
+  var p=v.split(':'),h=parseInt(p[0]),m=parseInt(p[1]),cm=m-24,ch=h;
+  if(cm<0){cm+=60;ch--;}if(ch<0)ch=23;
+  var ap=ch>=12?'PM':'AM',h12=ch%12||12;
+  var es=document.getElementById('eta-start');
+  if(es)es.textContent=h12+':'+(cm<10?'0':'')+cm+' '+ap;
+}
+
+// ═══════ TIMELINE ═══════
+function buildTimeline(){
+  var mode=ST.orderMode||'dinein';
+  // Status banner
+  var banner=document.getElementById('tl-status-banner');
+  var stxt=document.getElementById('tl-status-text');
+  if(mode==='delivery'){
+    if(banner){banner.className='alert blue';}
+    if(stxt)stxt.textContent='Order confirmed &middot; Kitchen notified &middot; Delivery partner assigned!';
+  } else if(mode==='takeout'){
+    if(banner){banner.className='alert amber';}
+    if(stxt)stxt.textContent='Order confirmed &middot; Ready for pickup in ~30 min!';
+  } else {
+    if(banner){banner.className='alert green';}
+    if(stxt)stxt.textContent='Table reserved &middot; Kitchen notified &middot; ETA synced!';
+  }
+  // Stats
+  var sg=document.getElementById('tl-stats');
+  if(sg){
+    if(mode==='delivery'){
+      sg.innerHTML='<div class="stat-c"><div class="stat-l">Delivery ETA</div><div class="stat-v">45 <span class="stat-u">min</span></div></div><div class="stat-c"><div class="stat-l">Distance</div><div class="stat-v">3.2 <span class="stat-u">km</span></div></div><div class="stat-c"><div class="stat-l">Cooking</div><div class="stat-v">22 <span class="stat-u">min</span></div></div><div class="stat-c"><div class="stat-l">Status</div><div class="stat-v" style="font-size:14px;color:var(--blue)">In progress</div></div>';
+    } else if(mode==='takeout'){
+      sg.innerHTML='<div class="stat-c"><div class="stat-l">Ready in</div><div class="stat-v">30 <span class="stat-u">min</span></div></div><div class="stat-c"><div class="stat-l">Order #</div><div class="stat-v">T019</div></div><div class="stat-c"><div class="stat-l">Cooking</div><div class="stat-v">22 <span class="stat-u">min</span></div></div><div class="stat-c"><div class="stat-l">Counter</div><div class="stat-v" style="font-size:14px">A3</div></div>';
+    } else {
+      sg.innerHTML='<div class="stat-c"><div class="stat-l">Your ETA</div><div class="stat-v">7:00 <span class="stat-u">PM</span></div></div><div class="stat-c"><div class="stat-l">Food ready</div><div class="stat-v">7:05 <span class="stat-u">PM</span></div></div><div class="stat-c"><div class="stat-l">Cook starts</div><div class="stat-v">6:36 <span class="stat-u">PM</span></div></div><div class="stat-c"><div class="stat-l">Table hold</div><div class="stat-v">15 <span class="stat-u">min</span></div></div>';
+    }
+  }
+  // Steps
+  var steps;
+  if(mode==='delivery'){
+    steps=[
+      {ico:'&#128203;',t:'Order placed',s:'Veg Miso Ramen x2, Gyoza x1',st:'dn'},
+      {ico:'&#127859;',t:'Kitchen cooking',s:'Estimated 22 min prep time',st:'ac',prog:true},
+      {ico:'&#128666;',t:'Out for delivery',s:'Partner will be assigned shortly',st:'pd'},
+      {ico:'&#127968;',t:'Delivered to your door',s:'Leave instructions in address field',st:'pd'},
+      {ico:'&#11088;',t:'Rate your experience',s:'Help others discover great food',st:'pd'},
+    ];
+  } else if(mode==='takeout'){
+    steps=[
+      {ico:'&#128203;',t:'Order confirmed',s:'Order #T019 received',st:'dn'},
+      {ico:'&#127859;',t:'Kitchen cooking',s:'Estimated 22 min prep time',st:'ac',prog:true},
+      {ico:'&#129457;',t:'Packed & ready',s:'Collect from Counter A3',st:'pd'},
+      {ico:'&#11088;',t:'Rate your experience',s:'',st:'pd'},
+    ];
+  } else {
+    steps=[
+      {ico:'&#128203;',t:'Booking confirmed',s:'Table 5 &middot; 2 guests &middot; 7:00 PM',st:'dn'},
+      {ico:'&#127869;',t:'Order placed',s:'Veg Miso Ramen x2, Gyoza x1',st:'dn'},
+      {ico:'&#127859;',t:'Kitchen cooking — starts 6:36 PM',s:'Timed for a fresh arrival',st:'ac',prog:true},
+      {ico:'&#128694;',t:'Your arrival',s:'Expected 7:00 PM',st:'pd'},
+      {ico:'&#127836;',t:'Dining',s:'Table 5 &middot; Window seat',st:'pd'},
+      {ico:'&#11088;',t:'Feedback',s:'Rate after dining',st:'pd'},
+    ];
+  }
+  var h='';
+  steps.forEach(function(s,i){
+    var last=i===steps.length-1;
+    h+='<div class="tl-row"><div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0">';
+    h+='<div class="tl-dot '+s.st+'">'+(s.st==='dn'?'&#10003;':s.ico)+'</div>';
+    if(!last)h+='<div class="tl-line '+(s.st==='dn'?'dn':'pd')+'"></div>';
+    h+='</div><div class="tl-ct"><div class="tl-t">'+s.t+'</div><div class="tl-s">'+s.s+'</div>';
+    if(s.prog)h+='<div class="prog-w"><div class="prog-b"></div></div>';
+    h+='</div></div>';
+  });
+  var ts=document.getElementById('tl-steps');if(ts)ts.innerHTML=h;
+  // Rescue grid
+  var rg=document.getElementById('rescue-grid');
+  if(rg){
+    if(mode==='delivery'){
+      rg.innerHTML='<button class="res-btn" onclick="toast(\'&#9989; Order cancelled!&#39;,&#39;green\')">&#10060; Cancel Order</button><button class="res-btn" onclick="toast(\'&#128336; Reschedule requested!&#39;,&#39;amber\')">&#128336; Reschedule</button><button class="res-btn" onclick="toast(\'&#9742; Contacting support...\')">&#9742; Contact Support</button><button class="res-btn" onclick="toast(\'&#128205; Address updated!&#39;,&#39;blue\')">&#128205; Change Address</button>';
+    } else if(mode==='takeout'){
+      rg.innerHTML='<button class="res-btn" onclick="toast(\'&#9989; Order cancelled!&#39;,&#39;green\')">&#10060; Cancel</button><button class="res-btn" onclick="toast(\'&#128666; Converting to delivery...\',\'blue\')">&#128666; Deliver Instead</button><button class="res-btn" onclick="toast(\'&#128336; Pickup time extended!&#39;,&#39;amber\')">&#128336; Extend Time</button><button class="res-btn" onclick="toast(\'&#9742; Support notified!\')">&#9742; Get Help</button>';
+    } else {
+      rg.innerHTML='<button class="res-btn" onclick="toast(\'&#9989; Cooking stopped!\',\'green\')">&#128721; Stop Cook</button><button class="res-btn" onclick="toast(\'&#128666; Converting to delivery...\',\'blue\')">&#128666; Deliver</button><button class="res-btn" onclick="toast(\'&#128197; Reschedule requested!\',\'amber\')">&#128197; Reschedule</button><button class="res-btn" onclick="toast(\'&#128717; Converting to takeout...\',\'blue\')">&#128717; Takeout</button>';
+    }
+  }
+}
+
+// ═══════ AI CHAT ═══════
+function renderChat(){
+  var a=document.getElementById('chat-area');if(!a)return;var h='';
+  chatMsgs.forEach(function(m){
+    if(m.r==='ai')h+='<div class="msg ai"><div class="ai-head">&#129302; Yummi &middot; AI Chef</div>'+m.t.replace(/\n/g,'<br>')+'</div>';
+    else h+='<div style="display:flex;justify-content:flex-end"><div class="msg me">'+m.t+'</div></div>';
+  });
+  a.innerHTML=h;a.scrollTop=a.scrollHeight;
+}
+function sendQ(t){var el=document.getElementById('chat-inp');if(el)el.value=t;sendChat();}
+function sendChat(){
+  var inp=document.getElementById('chat-inp'),txt=inp.value.trim();if(!txt)return;inp.value='';
+  chatMsgs.push({r:'user',t:txt});renderChat();
+  var a=document.getElementById('chat-area');
+  var td=document.createElement('div');td.id='typing-ind';
+  td.style.cssText='display:flex;gap:5px;padding:11px 14px;background:var(--s2);border:1px solid var(--border);border-radius:17px;border-bottom-left-radius:4px;width:70px;margin-bottom:11px';
+  [0,1,2].forEach(function(i){var d=document.createElement('div');d.className='tdot';d.style.animationDelay=i*0.22+'s';td.appendChild(d);});
+  a.appendChild(td);a.scrollTop=a.scrollHeight;
+  setTimeout(function(){
+    var l=txt.toLowerCase(),rep=AI_R.def;
+    if(l.includes('surprise')||l.includes('hidden'))rep=AI_R.surprise;
+    else if(l.includes('pair')||l.includes('combo'))rep=AI_R.pair;
+    else if(l.includes('trend')||l.includes('popular'))rep=AI_R.trend;
+    else if(l.includes('romantic')||l.includes('date'))rep=AI_R.romantic;
+    else if(l.includes('budget')||l.includes('cheap'))rep=AI_R.budget;
+    var t=document.getElementById('typing-ind');if(t)t.remove();
+    chatMsgs.push({r:'ai',t:rep});renderChat();
+  },1000+Math.random()*600);
+}
+
+// ═══════ GROUP ═══════
+function buildGroup(){
+  var total=Object.values(ST.votes).reduce(function(a,b){return a+b;},0)+1;
+  var h='';
+  VOTE_D.forEach(function(d,i){
+    var v=ST.votes[i]||0,pct=Math.round((v/total)*100);
+    h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:'+(i<VOTE_D.length-1?'13':'0')+'px">';
+    h+='<span style="font-size:28px;flex-shrink:0">'+d.e+'</span>';
+    h+='<div style="flex:1"><div style="font-size:13px;font-weight:500;margin-bottom:5px">'+d.n+'</div>';
+    h+='<div style="display:flex;align-items:center;gap:8px"><div class="vote-bar-w"><div class="vote-bar" style="width:'+pct+'%"></div></div>';
+    h+='<span style="font-size:11px;color:var(--gold);font-weight:600;min-width:32px;text-align:right">'+pct+'%</span></div></div></div>';
+  });
+  document.getElementById('vote-list').innerHTML=h;
+  h='';
+  MEMBERS.forEach(function(m){
+    var vd=m.d?m.v:(ST.myVote||'Voting...'),dn=m.d||!!ST.myVote;
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--s2);border:1px solid var(--border);border-radius:12px;margin-bottom:8px">';
+    h+='<div style="width:36px;height:36px;border-radius:50%;background:'+m.c+'22;color:'+m.c+';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0">'+m.i+'</div>';
+    h+='<div style="flex:1"><div style="font-size:13px;font-weight:500">'+m.n+'</div><div style="font-size:11px;color:var(--muted);margin-top:1px">'+vd+'</div></div>';
+    h+=dn?'<span class="badge bg">&#10003; Voted</span>':'<span class="badge ba">Pending</span>';
+    h+='</div>';
+  });
+  document.getElementById('member-list').innerHTML=h;
+  h='';
+  VOTE_D.forEach(function(d){
+    var on=ST.myVote===d.n;
+    h+='<button class="chip'+(on?' on':'')+'" onclick="pickVote(\''+d.n+'\')">'+d.e+' '+d.n+'</button>';
+  });
+  document.getElementById('my-votes').innerHTML=h;
+}
+function pickVote(n){ST.myVote=n;buildGroup();}
+function castVote(){
+  if(!ST.myVote){toast('&#9888; Please select a dish first','amber');return;}
+  var idx=VOTE_D.findIndex(function(d){return d.n===ST.myVote;});
+  if(idx>-1)ST.votes[idx]=(ST.votes[idx]||0)+1;
+  toast('&#128499; Vote cast for '+ST.myVote+'! &#127881;','green');buildGroup();
+}
+
+// ═══════ ADMIN ═══════
+function buildAdmin(){
+  var h='';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
+  [['24','Active orders'],['8/12','Tables occupied'],['&#8377;48.2k','Revenue today'],['4.9 &#11088;','Avg rating']].forEach(function(s){
+    h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:12px 14px"><div style="font-size:22px;font-weight:700;margin-bottom:2px">'+s[0]+'</div><div style="font-size:11px;color:var(--muted)">'+s[1]+'</div></div>';
+  });
+  h+='</div>';
+  var orders=[['Table 3 &middot; Veg Miso Ramen x2','ETA 7:15 PM','&#127859; Cooking','ba'],['Table 7 &middot; Gyoza + Matcha','ETA 7:30 PM','&#9203; Queued','bb'],['Delivery #D041 &middot; Sushi','2.3 km &middot; In transit','&#128666; Transit','bg'],['Takeout #T019 &middot; Bento','Ready for pickup','&#10003; Ready','bg']];
+  h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:14px"><div class="mlabel">Live orders</div>';
+  orders.forEach(function(o,i,a){h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:'+(i<a.length-1?'1px solid var(--border)':'none')+'"><div><div style="font-size:13px;font-weight:500;margin-bottom:2px">'+o[0]+'</div><div style="font-size:11px;color:var(--muted)">'+o[1]+'</div></div><span class="badge '+o[3]+'">'+o[2]+'</span></div>';});
+  h+='</div>';
+  var tables=[['Table 5 &mdash; Reserved','Priya S. &middot; ETA 7:00 PM','&#128993; Reserved','bgo'],['Table 8 &mdash; Available','4-person &middot; Window view','&#128994; Free','bg'],['Table 2 &mdash; Occupied','Free in ~18 min','&#128308; Occupied','br']];
+  h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:14px"><div class="mlabel">Table management</div>';
+  tables.forEach(function(t,i,a){h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:'+(i<a.length-1?'1px solid var(--border)':'none')+'"><div><div style="font-size:13px;font-weight:500;margin-bottom:2px">'+t[0]+'</div><div style="font-size:11px;color:var(--muted)">'+t[1]+'</div></div><span class="badge '+t[3]+'">'+t[2]+'</span></div>';});
+  h+='</div>';
+  h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:14px"><div class="mlabel">Settings</div>';
+  [['res','Accepting reservations'],['del','Home delivery enabled'],['tak','Takeout enabled'],['ai','AI recommendations'],['grp','Group voting']].forEach(function(pair,i,a){
+    var on=ST.toggles[pair[0]];
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:'+(i<a.length-1?'1px solid var(--border)':'none')+'"><span style="font-size:13px;font-weight:500">'+pair[1]+'</span><button class="tog '+(on?'on':'off')+'" onclick="togAdmin(\''+pair[0]+'\')" id="tog-'+pair[0]+'"></button></div>';
+  });
+  h+='</div>';
+  h+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:90px"><div class="mlabel">Conversions today</div>';
+  [['Dine-in &#8594; Delivery','3','var(--gold)'],['Dine-in &#8594; Takeout','2','var(--gold)'],['Cancelled','1','var(--red)']].forEach(function(c,i,a){
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:'+(i<a.length-1?'1px solid var(--border)':'none')+'"><span style="font-size:13px;color:var(--muted)">'+c[0]+'</span><span style="font-size:18px;font-weight:700;color:'+c[2]+'">'+c[1]+'</span></div>';
+  });
+  h+='</div>';
+  var ab=document.getElementById('admin-body');if(ab)ab.innerHTML=h;
+}
+function togAdmin(k){
+  ST.toggles[k]=!ST.toggles[k];
+  var btn=document.getElementById('tog-'+k);
+  if(btn){btn.classList.toggle('on',ST.toggles[k]);btn.classList.toggle('off',!ST.toggles[k]);}
+  toast((ST.toggles[k]?'&#9989; Enabled: ':'&#10060; Disabled: ')+k,'green');
+}
+
+// INIT
+buildDishes();buildRests();filterLocations('');
+</script>
+</body>
+</html>
